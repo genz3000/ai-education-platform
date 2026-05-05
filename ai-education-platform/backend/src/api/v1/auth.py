@@ -1,10 +1,10 @@
 """Authentication API endpoints"""
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Header
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from src.utils.database import get_db
-from src.utils.security import verify_password, create_access_token
+from src.utils.security import verify_password, create_access_token, decode_access_token
 from src.schemas.auth import UserCreate, UserLogin, Token, UserResponse
 from src.models.user import User
 
