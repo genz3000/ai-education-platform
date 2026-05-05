@@ -12,8 +12,7 @@ RUN npm install
 # Copy application
 COPY . .
 
-# Build application
-RUN npm run build
+# No build needed for placeholder
 
 # Expose port
 EXPOSE 3000
