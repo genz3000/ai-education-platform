@@ -17,7 +17,7 @@ class KnowledgeBase(Base):
     description = Column(Text)
     type = Column(String(50), default="textbook")  # textbook, notes, exam
     curriculum_mapping = Column(JSONB)  # DSE/TSA mapping
-    metadata = Column(JSONB)
+    meta_data = Column(JSONB)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -33,7 +33,7 @@ class Document(Base):
     file_type = Column(String(50))  # pdf, docx, pptx, etc.
     file_size = Column(String(50))
     chunk_count = Column(String(20))
-    metadata = Column(JSONB)  # title, section, difficulty
+    meta_data = Column(JSONB)  # title, section, difficulty
     status = Column(String(50), default="processing")  # processing, ready, error
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -48,5 +48,5 @@ class DocumentChunk(Base):
     content = Column(Text, nullable=False)
     chunk_index = Column(String(20))  # e.g., "2-1" means chapter 2, chunk 1
     embedding = Column(ARRAY(String))  # Store as text for pgvector
-    metadata = Column(JSONB)  # position, page, section
+    meta_data = Column(JSONB)  # position, page, section
     created_at = Column(DateTime, default=datetime.utcnow)

@@ -22,7 +22,7 @@ class Question(Base):
     dse_topic = Column(String(200))  # DSE topic mapping
     tsa_topic = Column(String(200))  # TSA topic mapping
     curriculum_code = Column(String(100))
-    metadata = Column(JSONB)
+    meta_data = Column(JSONB)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -41,7 +41,7 @@ class Assessment(Base):
     percentage = Column(Integer)
     status = Column(String(50), default="pending")  # pending, submitted, graded
     feedback = Column(Text)
-    metadata = Column(JSONB)
+    meta_data = Column(JSONB)
     generated_at = Column(DateTime, default=datetime.utcnow)
     submitted_at = Column(DateTime)
     graded_at = Column(DateTime)

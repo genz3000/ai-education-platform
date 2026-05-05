@@ -8,7 +8,7 @@ class DocumentCreate(BaseModel):
     """Document creation schema"""
     title: str
     type: str = "textbook"
-    metadata: Optional[dict] = None
+    meta_data: Optional[dict] = None
 
 
 class DocumentResponse(BaseModel):

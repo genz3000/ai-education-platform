@@ -18,7 +18,7 @@ class LearningRecord(Base):
     topic = Column(String(200))
     duration = Column(Integer)  # seconds
     result = Column(String(50))  # correct/incorrect
-    metadata = Column(JSONB)
+    meta_data = Column(JSONB)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
