@@ -24,14 +24,14 @@ export default function Login() {
       })
 
       if (!res.ok) {
-        throw new Error('登入失敗')
+        throw new Error('Login failed')
       }
 
       const data = await res.json()
       localStorage.setItem('token', data.access_token)
       router.push('/dashboard')
     } catch (err) {
-      setError('電郵或密碼錯誤')
+      setError('Invalid email or password')
     } finally {
       setLoading(false)
     }
@@ -44,8 +44,8 @@ export default function Login() {
           <div className="w-16 h-16 bg-primary-500 rounded-xl flex items-center justify-center mx-auto mb-4">
             <span className="text-white text-3xl">🎓</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-800">登入系統</h1>
-          <p className="text-gray-600 mt-2">歡迎回來</p>
+          <h1 className="text-2xl font-bold text-gray-800">Login</h1>
+          <p className="text-gray-600 mt-2">Welcome back</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -57,7 +57,7 @@ export default function Login() {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              電郵
+              Email
             </label>
             <input
               type="email"
@@ -71,7 +71,7 @@ export default function Login() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              密碼
+              Password
             </label>
             <input
               type="password"
@@ -88,14 +88,14 @@ export default function Login() {
             disabled={loading}
             className="w-full py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition disabled:opacity-50"
           >
-            {loading ? '登入中...' : '登入'}
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-600">
-          還沒有帳戶？{' '}
+          No account?{' '}
           <Link href="/register" className="text-primary-600 hover:underline">
-            立即註冊
+            Register now
           </Link>
         </div>
       </div>

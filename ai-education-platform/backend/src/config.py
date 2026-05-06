@@ -2,6 +2,7 @@
 from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List
+import json
 
 
 class Settings(BaseSettings):
@@ -36,7 +37,7 @@ class Settings(BaseSettings):
     EMBEDDING_DIMENSION: int = 1536
     
     # Vector Database
-    VECTOR_STORE_TYPE: str = "pgvector"  # pgvector / chroma / qdrant
+    VECTOR_STORE_TYPE: str = "pgvector"
     
     # File Storage
     S3_ENDPOINT: str = "http://localhost:9000"
@@ -45,7 +46,7 @@ class Settings(BaseSettings):
     S3_BUCKET: str = "ai-education"
     
     # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:3000"]
+    CORS_ORIGINS: str = '["http://localhost:3000","http://localhost:8501"]'
     
     # LMS Integration
     LMS_TYPE: str = "google_classroom"
@@ -64,6 +65,13 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return not self.DEBUG
+    
+    def get_cors_origins(self) -> List[str]:
+        """Parse CORS_ORIGINS from string"""
+        try:
+            return json.loads(self.CORS_ORIGINS)
+        except:
+            return ["http://localhost:3000"]
 
 
 @lru_cache()

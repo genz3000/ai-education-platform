@@ -21,7 +21,7 @@ async def upload_document(
     file: UploadFile = File(...),
     title: str = "",
     kb_type: str = "textbook",
-    school_id: str = "",
+    school_id: str = "b52ed795-43d2-4ad3-b765-a48e24c35862",
     db: AsyncSession = Depends(get_db)
 ):
     """Upload and process document"""

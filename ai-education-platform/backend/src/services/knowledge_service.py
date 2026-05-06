@@ -72,13 +72,60 @@ class KnowledgeService:
     
     async def _process_file(self, document_id: str, file: UploadFile):
         """Process file: extract text, chunk, embed"""
-        # TODO: Implement file processing pipeline
-        # 1. Read file (PDF, DOCX, PPTX)
-        # 2. Extract text
-        # 3. Chunk text (500 tokens, 50 overlap)
-        # 4. Generate embeddings
-        # 5. Store chunks with vectors
-        pass
+        try:
+            # Read file content
+            content = await file.read()
+            text = content.decode("utf-8", errors="ignore")
+            
+            # Import RAG components
+            from src.rag.chunker import chunk_text
+            from src.rag.embeddings import EmbeddingService
+            from src.models.knowledge import DocumentChunk
+            
+            # Chunk text
+            chunks = chunk_text(text)
+            
+            # Generate embeddings
+            embedding_service = EmbeddingService()
+            
+            # Create chunks in database
+            for i, chunk_data in enumerate(chunks):
+                embedding = await embedding_service.embed(chunk_data["content"])
+                
+                # Convert floats to strings for PostgreSQL ARRAY
+                embedding_str = [str(x) for x in embedding]
+                
+                chunk = DocumentChunk(
+                    document_id=document_id,
+                    content=chunk_data["content"],
+                    chunk_index=str(i),
+                    embedding=embedding_str,
+                    meta_data={"size": chunk_data.get("size", 0)}
+                )
+                self.db.add(chunk)
+            
+            # Update document status
+            result = await self.db.execute(
+                select(Document).where(Document.id == document_id)
+            )
+            doc = result.scalar_one_or_none()
+            if doc:
+                doc.status = "ready"
+                doc.chunk_count = str(len(chunks))
+            
+            await self.db.commit()
+            logger.info(f"Processed {len(chunks)} chunks for document {document_id}")
+            
+        except Exception as e:
+            logger.error(f"Error processing file: {e}")
+            # Mark as error
+            result = await self.db.execute(
+                select(Document).where(Document.id == document_id)
+            )
+            doc = result.scalar_one_or_none()
+            if doc:
+                doc.status = "error"
+            await self.db.commit()
     
     async def search(
         self,

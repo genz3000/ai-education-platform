@@ -1,7 +1,7 @@
 """API v1 Router"""
 from fastapi import APIRouter
 
-from src.api.v1 import auth, knowledge, qa, assessment, analytics
+from src.api.v1 import auth, knowledge, qa, assessment, analytics, rag
 
 api_router = APIRouter()
 
@@ -11,3 +11,4 @@ api_router.include_router(knowledge.router, prefix="/knowledge", tags=["Knowledg
 api_router.include_router(qa.router, prefix="/qa", tags=["Q&A"])
 api_router.include_router(assessment.router, prefix="/assessment", tags=["Assessment"])
 api_router.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
+api_router.include_router(rag.router, prefix="/rag", tags=["RAG"])

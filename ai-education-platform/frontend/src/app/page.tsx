@@ -15,14 +15,14 @@ export default function Home() {
             <div className="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center">
               <span className="text-white text-xl">🎓</span>
             </div>
-            <h1 className="text-xl font-bold text-gray-800">AI 教育知識庫系統</h1>
+            <h1 className="text-xl font-bold text-gray-800">AI Education Knowledge Base</h1>
           </div>
           <div className="flex gap-3">
             <Link href="/login" className="px-4 py-2 text-primary-600 hover:bg-primary-50 rounded-lg transition">
-              登入
+              Login
             </Link>
             <Link href="/register" className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition">
-              註冊
+              Register
             </Link>
           </div>
         </div>
@@ -32,17 +32,17 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-4 py-16">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            校本 AI 教學操作系統
+            School-Based AI Teaching Platform
           </h2>
           <p className="text-xl text-gray-600 mb-8">
-            基於香港教育局「智啟學教」政策，打造智能教學新體驗
+            Built on Hong Kong EDB "Smart Learning" Initiative, delivering intelligent teaching experiences
           </p>
           <div className="flex gap-4 justify-center">
             <Link href="/register" className="px-8 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition text-lg">
-              立即開始
+              Get Started
             </Link>
             <Link href="/demo" className="px-8 py-3 border-2 border-primary-500 text-primary-600 rounded-lg hover:bg-primary-50 transition text-lg">
-              查看演示
+              View Demo
             </Link>
           </div>
         </div>
@@ -51,43 +51,43 @@ export default function Home() {
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           <FeatureCard 
             icon="📚"
-            title="AI 知識庫"
-            description="校本教材智能管理，向量檢索，精準回答"
+            title="AI Knowledge Base"
+            description="School-based material management, vector search, accurate answers"
           />
           <FeatureCard 
             icon="💬"
-            title="AI 智能問答"
-            description="多輪對話，精準解答，即時回饋"
+            title="AI Smart Q&A"
+            description="Multi-turn conversation, precise answers, instant feedback"
           />
           <FeatureCard 
             icon="📝"
-            title="AI 評估系統"
-            description="自動出題，智能批改，個人化學習"
+            title="AI Assessment System"
+            description="Auto-generated questions, intelligent grading, personalized learning"
           />
           <FeatureCard 
             icon="📊"
-            title="學習分析"
-            description="數據驅動，精準定位弱項"
+            title="Learning Analytics"
+            description="Data-driven insights, precise weak-point identification"
           />
           <FeatureCard 
             icon="👨‍🏫"
-            title="教師工具"
-            description="教案生成，班級管理，高效備課"
+            title="Teacher Tools"
+            description="Lesson planning, class management, efficient preparation"
           />
           <FeatureCard 
             icon="🔒"
-            title="香港合規"
-            description="符合私隱條例，安全可靠"
+            title="HK Compliance"
+            description="Privacy ordinance compliant, safe and reliable"
           />
         </div>
 
         {/* Stats */}
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <div className="grid md:grid-cols-4 gap-8 text-center">
-            <StatItem value="1000+" label="學校使用" />
-            <StatItem value="50,000+" label="師生用戶" />
-            <StatItem value="1M+" label="問答記錄" />
-            <StatItem value="98%" label="準確率" />
+            <StatItem value="1000+" label="Schools" />
+            <StatItem value="50,000+" label="Users" />
+            <StatItem value="1M+" label="Q&A Records" />
+            <StatItem value="98%" label="Accuracy" />
           </div>
         </div>
       </main>
@@ -95,7 +95,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-8">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <p>© 2024 AI 教育知識庫系統 | 基於香港教育局政策</p>
+          <p>© 2024 AI Education Knowledge Base | Based on HK EDB Policy</p>
         </div>
       </footer>
     </div>

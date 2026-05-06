@@ -1,8 +1,9 @@
 """Authentication schemas"""
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 from typing import Optional
 from datetime import datetime
 from enum import Enum
+from uuid import UUID
 
 
 class UserRole(str, Enum):
@@ -43,6 +44,13 @@ class UserResponse(BaseModel):
     full_name: Optional[str] = None
     is_active: str = "true"
     created_at: datetime
+    
+    @field_validator('id', mode='before')
+    @classmethod
+    def convert_id(cls, v):
+        if isinstance(v, UUID):
+            return str(v)
+        return v
     
     class Config:
         from_attributes = True

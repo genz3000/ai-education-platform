@@ -28,12 +28,12 @@ export default function Register() {
       })
 
       if (!res.ok) {
-        throw new Error('註冊失敗')
+        throw new Error('Registration failed')
       }
 
       router.push('/login')
     } catch (err) {
-      setError('註冊失敗，請重試')
+      setError('Registration failed, please try again')
     } finally {
       setLoading(false)
     }
@@ -46,8 +46,8 @@ export default function Register() {
           <div className="w-16 h-16 bg-primary-500 rounded-xl flex items-center justify-center mx-auto mb-4">
             <span className="text-white text-3xl">🎓</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-800">創建帳戶</h1>
-          <p className="text-gray-600 mt-2">加入 AI 教育知識庫系統</p>
+          <h1 className="text-2xl font-bold text-gray-800">Create Account</h1>
+          <p className="text-gray-600 mt-2">Join AI Education Knowledge Base</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -59,7 +59,7 @@ export default function Register() {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              電郵
+              Email
             </label>
             <input
               type="email"
@@ -72,7 +72,7 @@ export default function Register() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              用戶名
+              Username
             </label>
             <input
               type="text"
@@ -85,7 +85,7 @@ export default function Register() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              密碼
+              Password
             </label>
             <input
               type="password"
@@ -98,15 +98,15 @@ export default function Register() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              角色
+              Role
             </label>
             <select
               value={formData.role}
               onChange={(e) => setFormData({...formData, role: e.target.value})}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
             >
-              <option value="student">學生</option>
-              <option value="teacher">教師</option>
+              <option value="student">Student</option>
+              <option value="teacher">Teacher</option>
             </select>
           </div>
 
@@ -115,14 +115,14 @@ export default function Register() {
             disabled={loading}
             className="w-full py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition disabled:opacity-50"
           >
-            {loading ? '註冊中...' : '註冊'}
+            {loading ? 'Registering...' : 'Register'}
           </button>
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-600">
-          已有帳戶？{' '}
+          Already have an account?{' '}
           <Link href="/login" className="text-primary-600 hover:underline">
-            立即登入
+            Login now
           </Link>
         </div>
       </div>

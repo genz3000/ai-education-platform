@@ -1,19 +1,20 @@
 'use client'
 
 import { useState } from 'react'
-import { Send, User, Bot, ThumbsUp, ThumbsDown } from 'lucide-react'
+import { Send, User, Bot, ThumbsUp, ThumbsDown, BookOpen, ChevronDown, ChevronUp } from 'lucide-react'
 
 interface Message {
   id: string
   role: 'user' | 'assistant'
   content: string
-  sources?: { title: string; content: string }[]
+  context?: string
+  sources?: { source: string; score: number; excerpt: string }[]
 }
 
 const modeOptions = [
-  { id: 'student', label: '👨‍🎓 學生模式', desc: '用簡單易懂的語言解答' },
-  { id: 'teacher', label: '👨‍🏫 教師模式', desc: '提供專業的教學建議' },
-  { id: 'parent', label: '👨‍👩‍👧 家長模式', desc: '幫助了解子女學習情況' },
+  { id: 'student', label: '👨‍🎓 Student', desc: 'Simple, easy-to-understand answers' },
+  { id: 'teacher', label: '👨‍🏫 Teacher', desc: 'Professional teaching suggestions' },
+  { id: 'parent', label: '👨‍👩‍👧 Parent', desc: 'Help understand child learning' },
 ]
 
 export default function QAPage() {
@@ -21,12 +22,19 @@ export default function QAPage() {
     {
       id: '1',
       role: 'assistant',
-      content: '你好！我是 AI 助教。選擇一種模式後，輸入你的問題，我會根據校本知識庫為你解答。',
+      content: 'Hello! I\'m your AI teaching assistant. Ask me any question and I\'ll answer based on the school\'s knowledge base.',
     }
   ])
   const [input, setInput] = useState('')
   const [mode, setMode] = useState('student')
   const [loading, setLoading] = useState(false)
+  const [expandedSources, setExpandedSources] = useState<string[]>([])
+
+  const toggleSource = (id: string) => {
+    setExpandedSources(prev => 
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    )
+  }
 
   const handleSend = async () => {
     if (!input.trim()) return
@@ -42,23 +50,34 @@ export default function QAPage() {
     setLoading(true)
 
     try {
-      const res = await fetch('http://localhost:8000/api/v1/qa/ask', {
+      // First, query RAG to get context
+      const ragRes = await fetch('http://localhost:8000/api/v1/rag/query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          question: input,
-          mode: mode,
-          user_id: 'demo'
+          query: input,
+          school_id: 'b52ed795-43d2-4ad3-b765-a48e24c35862',
+          top_k: 3
         })
       })
 
-      const data = await res.json()
+      const ragData = await ragRes.json()
       
+      // Build answer from RAG context
+      let answer = ''
+      if (ragData.chunks && ragData.chunks.length > 0) {
+        const contextText = ragData.chunks.map((c: any) => c.content).join('\n\n')
+        answer = `Based on the school knowledge base:\n\n${contextText}\n\n[Sources: ${ragData.chunks.map((c: any) => c.source).join(', ')}]`
+      } else {
+        answer = 'I couldn\'t find relevant information in the knowledge base. Try uploading some documents first, or rephrase your question.'
+      }
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: data.answer || '這是一個示範回答。連接 API 後會顯示真實答案。',
-        sources: data.sources || []
+        content: answer,
+        context: ragData.context,
+        sources: ragData.citations
       }
 
       setMessages(prev => [...prev, assistantMessage])
@@ -66,7 +85,7 @@ export default function QAPage() {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: '抱歉，發生了錯誤。請稍後再試。'
+        content: 'Sorry, an error occurred. Please check if the backend is running.'
       }
       setMessages(prev => [...prev, errorMessage])
     } finally {
@@ -76,7 +95,7 @@ export default function QAPage() {
 
   return (
     <div className="h-[calc(100vh-180px)] flex flex-col">
-      <h1 className="text-2xl font-bold text-gray-800 mb-4">AI 智能問答</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-4">🤖 AI Smart Q&A</h1>
 
       {/* Mode Selection */}
       <div className="flex gap-3 mb-4">
@@ -84,7 +103,7 @@ export default function QAPage() {
           <button
             key={option.id}
             onClick={() => setMode(option.id)}
-            className={`px-4 py-2 rounded-lg transition ${
+            className={`px-4 py-2 rounded-lg transition text-sm ${
               mode === option.id 
                 ? 'bg-primary-500 text-white' 
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -104,42 +123,72 @@ export default function QAPage() {
               key={msg.id}
               className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
             >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                msg.role === 'user' ? 'bg-primary-500' : 'bg-gray-200'
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+                msg.role === 'user' ? 'bg-primary-500' : 'bg-blue-100'
               }`}>
                 {msg.role === 'user' ? (
-                  <User className="w-4 h-4 text-white" />
+                  <User className="w-5 h-5 text-white" />
                 ) : (
-                  <Bot className="w-4 h-4 text-gray-600" />
+                  <Bot className="w-5 h-5 text-blue-600" />
                 )}
               </div>
-              <div className={`max-w-[70%] rounded-xl p-4 ${
+              <div className={`max-w-[75%] rounded-2xl p-4 ${
                 msg.role === 'user' 
                   ? 'bg-primary-500 text-white' 
-                  : 'bg-gray-100 text-gray-800'
+                  : 'bg-gray-50 text-gray-800 border border-gray-200'
               }`}>
-                <p className="whitespace-pre-wrap">{msg.content}</p>
+                <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                 
-                {/* Sources */}
+                {/* Sources with expandable excerpts */}
                 {msg.sources && msg.sources.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-gray-200">
-                    <p className="text-sm font-medium mb-2">📚 參考來源：</p>
-                    {msg.sources.map((source, idx) => (
-                      <div key={idx} className="text-sm opacity-80 mb-1">
-                        • {source.title}
-                      </div>
-                    ))}
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <p className="text-sm font-semibold mb-3 flex items-center gap-2">
+                      <BookOpen className="w-4 h-4" />
+                      📚 Sources ({msg.sources.length})
+                    </p>
+                    <div className="space-y-2">
+                      {msg.sources.map((source, idx) => {
+                        const sourceId = `${msg.id}-source-${idx}`
+                        const isExpanded = expandedSources.includes(sourceId)
+                        return (
+                          <div 
+                            key={idx} 
+                            className="bg-white rounded-lg p-3 border border-gray-100"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                                  {Math.round(source.score * 100)}% match
+                                </span>
+                                <span className="font-medium text-sm">{source.source}</span>
+                              </div>
+                              <button 
+                                onClick={() => toggleSource(sourceId)}
+                                className="text-gray-400 hover:text-gray-600"
+                              >
+                                {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                              </button>
+                            </div>
+                            {isExpanded && (
+                              <p className="mt-2 text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                                {source.excerpt}
+                              </p>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
                   </div>
                 )}
 
-                {/* Feedback */}
+                {/* Feedback buttons */}
                 {msg.role === 'assistant' && (
-                  <div className="mt-3 pt-3 border-t border-gray-200 flex gap-2">
-                    <button className="text-sm opacity-70 hover:opacity-100 flex items-center gap-1">
-                      <ThumbsUp className="w-4 h-4" /> 有用
+                  <div className="mt-4 pt-3 border-t border-gray-200 flex gap-3">
+                    <button className="text-sm opacity-70 hover:opacity-100 flex items-center gap-1 transition">
+                      <ThumbsUp className="w-4 h-4" /> Helpful
                     </button>
-                    <button className="text-sm opacity-70 hover:opacity-100 flex items-center gap-1">
-                      <ThumbsDown className="w-4 h-4" /> 不準確
+                    <button className="text-sm opacity-70 hover:opacity-100 flex items-center gap-1 transition">
+                      <ThumbsDown className="w-4 h-4" /> Not accurate
                     </button>
                   </div>
                 )}
@@ -149,40 +198,44 @@ export default function QAPage() {
           
           {loading && (
             <div className="flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                <Bot className="w-4 h-4 text-gray-600" />
+              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                <Bot className="w-5 h-5 text-blue-600" />
               </div>
-              <div className="bg-gray-100 rounded-xl p-4">
+              <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
                 <div className="flex gap-1">
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                 </div>
+                <p className="text-sm text-gray-500 mt-2">Searching knowledge base...</p>
               </div>
             </div>
           )}
         </div>
 
         {/* Input */}
-        <div className="p-4 border-t">
+        <div className="p-4 border-t bg-gray-50">
           <div className="flex gap-3">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="輸入你的問題..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+              onKeyPress={(e) => e.key === 'Enter' && !loading && handleSend()}
+              placeholder="Ask about math, science, or any school subject..."
+              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
             <button
               onClick={handleSend}
               disabled={!input.trim() || loading}
-              className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 transition flex items-center gap-2"
+              className="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 transition flex items-center gap-2 font-medium"
             >
               <Send className="w-4 h-4" />
-              發送
+              Send
             </button>
           </div>
+          <p className="text-xs text-gray-500 mt-2">
+            Powered by RAG • Queries school knowledge base
+          </p>
         </div>
       </div>
     </div>
